@@ -1,0 +1,77 @@
+/* ProgressBar Component Styles */
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.textWrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.current {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-black);
+}
+
+.separator {
+  font-size: var(--text-sm);
+  color: var(--color-gray-400);
+  margin: 0 2px;
+}
+
+.total {
+  font-size: var(--text-sm);
+  color: var(--color-gray-400);
+}
+
+.track {
+  flex: 1;
+  height: 4px;
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background-color: var(--color-black);
+  border-radius: var(--radius-full);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.percentage {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-gray-500);
+  flex-shrink: 0;
+  min-width: 40px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .container {
+    gap: var(--spacing-sm);
+  }
+
+  .current {
+    font-size: var(--text-base);
+  }
+
+  .track {
+    height: 3px;
+  }
+
+  .percentage {
+    font-size: var(--text-xs);
+  }
+}

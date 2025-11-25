@@ -1,0 +1,172 @@
+/* ChoiceQuestion Component Styles */
+
+.container {
+  width: 100%;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.questionInfo {
+  margin-bottom: var(--spacing-xl);
+}
+
+.section {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-sm);
+  padding: 4px 8px;
+  background: var(--color-gray-100);
+  border-radius: var(--radius-sm);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+.questionText {
+  font-size: var(--text-base);
+  color: var(--color-gray-700);
+  line-height: 1.7;
+}
+
+.optionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.optionButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-white);
+  border: 2px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.optionButton:hover {
+  border-color: var(--color-gray-400);
+  background: var(--color-gray-50);
+}
+
+.optionButton.selected {
+  border-color: var(--color-black);
+  background: var(--color-gray-50);
+}
+
+.radioCircle {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-gray-300);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.optionButton.selected .radioCircle {
+  border-color: var(--color-black);
+}
+
+.radioFill {
+  width: 12px;
+  height: 12px;
+  background: var(--color-black);
+  border-radius: 50%;
+  animation: scaleIn 0.2s ease-out;
+}
+
+.optionText {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-gray-700);
+}
+
+.optionButton.selected .optionText {
+  color: var(--color-black);
+}
+
+.optionalNote {
+  margin-top: var(--spacing-lg);
+  font-size: var(--text-sm);
+  color: var(--color-gray-500);
+  font-style: italic;
+}
+
+/* Mobile optimization */
+@media (max-width: 640px) {
+  .title {
+    font-size: var(--text-lg);
+  }
+
+  .questionText {
+    font-size: var(--text-sm);
+  }
+
+  .optionButton {
+    padding: var(--spacing-md);
+  }
+
+  .radioCircle {
+    width: 20px;
+    height: 20px;
+  }
+
+  .radioFill {
+    width: 10px;
+    height: 10px;
+  }
+
+  .optionText {
+    font-size: var(--text-sm);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Touch device */
+@media (hover: none) {
+  .optionButton:hover {
+    background: var(--color-white);
+    border-color: var(--color-gray-200);
+  }
+
+  .optionButton:active {
+    background: var(--color-gray-100);
+  }
+}
