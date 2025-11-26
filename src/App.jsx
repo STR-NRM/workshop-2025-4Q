@@ -5,6 +5,7 @@ import Complete from './pages/Complete';
 import Result from './pages/Result';
 import TextAnalysis from './pages/TextAnalysis';
 import AnalysisResult from './pages/AnalysisResult';
+import ComprehensiveResult from './pages/ComprehensiveResult';
 
 /**
  * 메인 앱 컴포넌트
@@ -13,8 +14,9 @@ import AnalysisResult from './pages/AnalysisResult';
  * - /survey : 설문 페이지
  * - /complete : 설문 완료 페이지
  * - /result : 결과 페이지 (차트, 통계)
- * - /result/text : 서술형 AI 분석 목록
- * - /result/text/:questionId : 개별 분석 결과
+ * - /result/text : AI 분석 페이지 (서술형 + 전체 분석)
+ * - /result/text/:questionId : 서술형 개별 분석 결과
+ * - /result/comprehensive : 전체 종합 분석 결과
  */
 function App() {
   return (
@@ -32,9 +34,10 @@ function App() {
         {/* 결과 페이지 */}
         <Route path="/result" element={<Result />} />
 
-        {/* 서술형 AI 분석 */}
+        {/* AI 분석 */}
         <Route path="/result/text" element={<TextAnalysis />} />
         <Route path="/result/text/:questionId" element={<AnalysisResult />} />
+        <Route path="/result/comprehensive" element={<ComprehensiveResult />} />
 
         {/* 404 - 메인으로 리다이렉트 */}
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -379,7 +379,7 @@ export default function Result() {
               size="lg"
               onClick={() => navigate('/result/text')}
             >
-              서술형 분석하기
+              AI로 분석하기
             </Button>
           </div>
         </div>

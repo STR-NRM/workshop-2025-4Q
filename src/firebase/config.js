@@ -186,6 +186,51 @@ export const analysisService = {
     const snapshot = await get(analysisRef);
     return snapshot.exists() ? snapshot.val() : {};
   },
+
+  // 전체 종합 분석 결과 저장
+  async saveComprehensiveAnalysis(result, model) {
+    console.log('[Firebase] saveComprehensiveAnalysis 시작');
+    console.log('[Firebase] result 타입:', typeof result);
+    console.log('[Firebase] result 길이:', result?.length);
+    console.log('[Firebase] model:', model);
+
+    // 데이터 크기 계산 (UTF-8 바이트)
+    const dataSize = new Blob([JSON.stringify({ result, analyzedAt: Date.now(), model })]).size;
+    console.log('[Firebase] 총 데이터 크기 (bytes):', dataSize);
+    console.log('[Firebase] 총 데이터 크기 (KB):', (dataSize / 1024).toFixed(2));
+
+    // Firebase 연결 상태 확인
+    console.log('[Firebase] database 객체 존재:', !!database);
+
+    try {
+      const analysisRef = ref(database, 'comprehensiveAnalysis');
+      console.log('[Firebase] ref 생성 완료');
+
+      const dataToSave = {
+        result,
+        analyzedAt: Date.now(),
+        model,
+      };
+      console.log('[Firebase] set() 호출 시작...');
+
+      await set(analysisRef, dataToSave);
+      console.log('[Firebase] set() 완료 - 저장 성공!');
+    } catch (error) {
+      console.error('[Firebase] set() 실패!');
+      console.error('[Firebase] 에러 이름:', error.name);
+      console.error('[Firebase] 에러 코드:', error.code);
+      console.error('[Firebase] 에러 메시지:', error.message);
+      console.error('[Firebase] 에러 전체:', error);
+      throw error; // 상위로 에러 전파
+    }
+  },
+
+  // 전체 종합 분석 결과 가져오기
+  async getComprehensiveAnalysis() {
+    const analysisRef = ref(database, 'comprehensiveAnalysis');
+    const snapshot = await get(analysisRef);
+    return snapshot.exists() ? snapshot.val() : null;
+  },
 };
 
 // 실시간 구독 함수
