@@ -391,7 +391,7 @@ export const COMPREHENSIVE_MODEL_CONFIG = {
   reasoning: {
     effort: "high"
   },
-  max_output_tokens: 128000,
+  max_output_tokens: 64000,
   text: {
     format: { type: "text" },
     verbosity: "high"

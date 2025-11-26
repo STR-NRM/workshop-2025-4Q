@@ -64,25 +64,164 @@ export default function ComprehensiveResult() {
     );
   }
 
-  // 마크다운 라인 렌더링
-  const renderLine = (line, idx) => {
-    if (line.startsWith('# ')) {
-      return <h1 key={idx} className={styles.reportH1}>{line.substring(2)}</h1>;
-    } else if (line.startsWith('## ')) {
-      return <h2 key={idx} className={styles.reportH2}>{line.substring(3)}</h2>;
-    } else if (line.startsWith('### ')) {
-      return <h3 key={idx} className={styles.reportH3}>{line.substring(4)}</h3>;
-    } else if (line.startsWith('- ') || line.startsWith('* ')) {
-      return <li key={idx} className={styles.reportLi}>{line.substring(2)}</li>;
-    } else if (line.match(/^\d+\. /)) {
-      return <li key={idx} className={styles.reportLi}>{line}</li>;
-    } else if (line.startsWith('**') && line.endsWith('**')) {
-      return <p key={idx} className={styles.reportBold}>{line.replace(/\*\*/g, '')}</p>;
-    } else if (line.trim() === '') {
-      return <br key={idx} />;
-    } else {
-      return <p key={idx} className={styles.reportP}>{line}</p>;
+  // 인라인 마크다운 파싱 (bold, italic, code)
+  const parseInlineMarkdown = (text) => {
+    if (!text) return text;
+
+    const parts = [];
+    let remaining = text;
+    let key = 0;
+
+    while (remaining.length > 0) {
+      // Bold: **text** or __text__
+      const boldMatch = remaining.match(/^(.*?)\*\*(.+?)\*\*/);
+      const boldMatch2 = remaining.match(/^(.*?)__(.+?)__/);
+      // Italic: *text* or _text_
+      const italicMatch = remaining.match(/^(.*?)\*([^*]+?)\*/);
+      // Inline code: `code`
+      const codeMatch = remaining.match(/^(.*?)`([^`]+?)`/);
+
+      const matches = [
+        boldMatch && { match: boldMatch, type: 'bold', idx: boldMatch.index + boldMatch[1].length },
+        boldMatch2 && { match: boldMatch2, type: 'bold', idx: boldMatch2.index + boldMatch2[1].length },
+        italicMatch && { match: italicMatch, type: 'italic', idx: italicMatch.index + italicMatch[1].length },
+        codeMatch && { match: codeMatch, type: 'code', idx: codeMatch.index + codeMatch[1].length }
+      ].filter(Boolean).sort((a, b) => a.idx - b.idx);
+
+      if (matches.length === 0) {
+        parts.push(remaining);
+        break;
+      }
+
+      const first = matches[0];
+      if (first.match[1]) {
+        parts.push(first.match[1]);
+      }
+
+      if (first.type === 'bold') {
+        parts.push(<strong key={key++}>{first.match[2]}</strong>);
+        remaining = remaining.substring(first.match[0].length);
+      } else if (first.type === 'italic') {
+        parts.push(<em key={key++}>{first.match[2]}</em>);
+        remaining = remaining.substring(first.match[0].length);
+      } else if (first.type === 'code') {
+        parts.push(<code key={key++} className={styles.inlineCode}>{first.match[2]}</code>);
+        remaining = remaining.substring(first.match[0].length);
+      }
     }
+
+    return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : parts;
+  };
+
+  // 마크다운 테이블 파싱
+  const parseTable = (lines, startIdx) => {
+    const tableLines = [];
+    let i = startIdx;
+
+    // 테이블 라인 수집
+    while (i < lines.length && lines[i].trim().startsWith('|')) {
+      tableLines.push(lines[i]);
+      i++;
+    }
+
+    if (tableLines.length < 2) return null;
+
+    // 헤더 파싱
+    const headerCells = tableLines[0].split('|').filter(cell => cell.trim() !== '');
+
+    // 구분선 확인 (두 번째 줄)
+    const separatorLine = tableLines[1];
+    if (!separatorLine.includes('-')) return null;
+
+    // 바디 파싱
+    const bodyRows = tableLines.slice(2).map(line =>
+      line.split('|').filter(cell => cell.trim() !== '')
+    );
+
+    return {
+      headers: headerCells.map(cell => cell.trim()),
+      rows: bodyRows.map(row => row.map(cell => cell.trim())),
+      endIdx: i
+    };
+  };
+
+  // 마크다운 전체 렌더링
+  const renderMarkdown = (text) => {
+    if (!text) return null;
+
+    const lines = text.split('\n');
+    const elements = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i];
+      const trimmed = line.trim();
+
+      // 테이블 감지
+      if (trimmed.startsWith('|')) {
+        const table = parseTable(lines, i);
+        if (table) {
+          elements.push(
+            <div key={i} className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    {table.headers.map((header, hIdx) => (
+                      <th key={hIdx}>{parseInlineMarkdown(header)}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.rows.map((row, rIdx) => (
+                    <tr key={rIdx}>
+                      {row.map((cell, cIdx) => (
+                        <td key={cIdx}>{parseInlineMarkdown(cell)}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+          i = table.endIdx;
+          continue;
+        }
+      }
+
+      // 헤딩
+      if (trimmed.startsWith('# ')) {
+        elements.push(<h1 key={i} className={styles.reportH1}>{parseInlineMarkdown(trimmed.substring(2))}</h1>);
+      } else if (trimmed.startsWith('## ')) {
+        elements.push(<h2 key={i} className={styles.reportH2}>{parseInlineMarkdown(trimmed.substring(3))}</h2>);
+      } else if (trimmed.startsWith('### ')) {
+        elements.push(<h3 key={i} className={styles.reportH3}>{parseInlineMarkdown(trimmed.substring(4))}</h3>);
+      } else if (trimmed.startsWith('#### ')) {
+        elements.push(<h4 key={i} className={styles.reportH4}>{parseInlineMarkdown(trimmed.substring(5))}</h4>);
+      }
+      // 구분선
+      else if (trimmed === '---' || trimmed === '***') {
+        elements.push(<hr key={i} className={styles.divider} />);
+      }
+      // 리스트
+      else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        elements.push(<li key={i} className={styles.reportLi}>{parseInlineMarkdown(trimmed.substring(2))}</li>);
+      } else if (trimmed.match(/^\d+\. /)) {
+        const content = trimmed.replace(/^\d+\. /, '');
+        elements.push(<li key={i} className={styles.reportLi}>{parseInlineMarkdown(content)}</li>);
+      }
+      // 빈 줄
+      else if (trimmed === '') {
+        elements.push(<br key={i} />);
+      }
+      // 일반 문단
+      else {
+        elements.push(<p key={i} className={styles.reportP}>{parseInlineMarkdown(line)}</p>);
+      }
+
+      i++;
+    }
+
+    return elements;
   };
 
   return (
@@ -111,7 +250,7 @@ export default function ComprehensiveResult() {
           <section className={styles.analysisSection}>
             <Card className={styles.analysisCard}>
               <div className={styles.reportContent}>
-                {analysis.result.split('\n').map((line, idx) => renderLine(line, idx))}
+                {renderMarkdown(analysis.result)}
               </div>
             </Card>
           </section>
