@@ -138,6 +138,8 @@
   background: var(--color-gray-100);
   padding: 2px 10px;
   border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Actions */
@@ -248,6 +250,7 @@
 .comprehensiveActions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--spacing-md);
   padding-top: var(--spacing-lg);
   border-top: 1px solid var(--color-gray-100);
@@ -344,5 +347,31 @@
 
   .actions > * {
     flex: 1;
+  }
+
+  /* Comprehensive Analysis Card Mobile */
+  .comprehensiveCard {
+    padding: var(--spacing-lg);
+  }
+
+  .comprehensiveActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+
+  .comprehensiveActions > button {
+    width: 100%;
+  }
+
+  .comprehensiveActions .analyzedBadge {
+    text-align: center;
+    margin-top: var(--spacing-xs);
+  }
+
+  .meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
   }
 }
